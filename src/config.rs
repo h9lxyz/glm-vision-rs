@@ -181,10 +181,7 @@ mod tests {
             Provider::Zhipu.base_url(),
             "https://open.bigmodel.cn/api/paas/v4/"
         );
-        assert_eq!(
-            Provider::Zai.base_url(),
-            "https://api.z.ai/api/paas/v4/"
-        );
+        assert_eq!(Provider::Zai.base_url(), "https://api.z.ai/api/paas/v4/");
         assert_eq!(
             Provider::ZaiCoding.base_url(),
             "https://api.z.ai/api/coding/paas/v4/"
@@ -220,12 +217,10 @@ mod tests {
 
     #[test]
     fn test_completions_url() {
-        let config = VisionConfig::new("key")
-            .with_provider(Provider::Zhipu);
+        let config = VisionConfig::new("key").with_provider(Provider::Zhipu);
         assert!(config.completions_url().ends_with("/chat/completions"));
 
-        let config2 = VisionConfig::new("key")
-            .with_base_url("https://api.z.ai/api/paas/v4");
+        let config2 = VisionConfig::new("key").with_base_url("https://api.z.ai/api/paas/v4");
         assert_eq!(
             config2.completions_url(),
             "https://api.z.ai/api/paas/v4/chat/completions"
@@ -234,8 +229,7 @@ mod tests {
 
     #[test]
     fn test_serde_roundtrip() {
-        let config = VisionConfig::new("my-key")
-            .with_provider(Provider::Zhipu);
+        let config = VisionConfig::new("my-key").with_provider(Provider::Zhipu);
         let json = serde_json::to_string(&config).unwrap();
         let parsed: VisionConfig = serde_json::from_str(&json).unwrap();
         assert_eq!(parsed.api_key, "my-key");

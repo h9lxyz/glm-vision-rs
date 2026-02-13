@@ -43,14 +43,16 @@ pub async fn extract_text(
 ) -> Result<String> {
     let image = client.process_image(image_source)?;
     let enhanced_prompt = match programming_language {
-        Some(lang) => format!(
-            "Programming language context: {}\n\n{}",
-            lang, prompt
-        ),
+        Some(lang) => format!("Programming language context: {}\n\n{}", lang, prompt),
         None => prompt.to_string(),
     };
     client
-        .completion_with_retry(prompts::TEXT_EXTRACTION, vec![image], &enhanced_prompt, DEFAULT_RETRIES)
+        .completion_with_retry(
+            prompts::TEXT_EXTRACTION,
+            vec![image],
+            &enhanced_prompt,
+            DEFAULT_RETRIES,
+        )
         .await
 }
 
@@ -65,14 +67,16 @@ pub async fn diagnose_error(
 ) -> Result<String> {
     let image = client.process_image(image_source)?;
     let enhanced_prompt = match context {
-        Some(ctx) => format!(
-            "Context: {}\n\n{}",
-            ctx, prompt
-        ),
+        Some(ctx) => format!("Context: {}\n\n{}", ctx, prompt),
         None => prompt.to_string(),
     };
     client
-        .completion_with_retry(prompts::ERROR_DIAGNOSIS, vec![image], &enhanced_prompt, DEFAULT_RETRIES)
+        .completion_with_retry(
+            prompts::ERROR_DIAGNOSIS,
+            vec![image],
+            &enhanced_prompt,
+            DEFAULT_RETRIES,
+        )
         .await
 }
 
@@ -87,14 +91,16 @@ pub async fn understand_diagram(
 ) -> Result<String> {
     let image = client.process_image(image_source)?;
     let enhanced_prompt = match diagram_type {
-        Some(dt) => format!(
-            "Diagram type: {}\n\n{}",
-            dt, prompt
-        ),
+        Some(dt) => format!("Diagram type: {}\n\n{}", dt, prompt),
         None => prompt.to_string(),
     };
     client
-        .completion_with_retry(prompts::DIAGRAM_UNDERSTANDING, vec![image], &enhanced_prompt, DEFAULT_RETRIES)
+        .completion_with_retry(
+            prompts::DIAGRAM_UNDERSTANDING,
+            vec![image],
+            &enhanced_prompt,
+            DEFAULT_RETRIES,
+        )
         .await
 }
 
@@ -109,14 +115,16 @@ pub async fn analyze_data_viz(
 ) -> Result<String> {
     let image = client.process_image(image_source)?;
     let enhanced_prompt = match analysis_focus {
-        Some(focus) => format!(
-            "Analysis focus: {}\n\n{}",
-            focus, prompt
-        ),
+        Some(focus) => format!("Analysis focus: {}\n\n{}", focus, prompt),
         None => prompt.to_string(),
     };
     client
-        .completion_with_retry(prompts::DATA_VIZ_ANALYSIS, vec![image], &enhanced_prompt, DEFAULT_RETRIES)
+        .completion_with_retry(
+            prompts::DATA_VIZ_ANALYSIS,
+            vec![image],
+            &enhanced_prompt,
+            DEFAULT_RETRIES,
+        )
         .await
 }
 
@@ -158,7 +166,12 @@ pub async fn analyze_image(
     }
     let image = client.process_image(image_source)?;
     client
-        .completion_with_retry(prompts::GENERAL_IMAGE_ANALYSIS, vec![image], prompt, DEFAULT_RETRIES)
+        .completion_with_retry(
+            prompts::GENERAL_IMAGE_ANALYSIS,
+            vec![image],
+            prompt,
+            DEFAULT_RETRIES,
+        )
         .await
 }
 
@@ -173,13 +186,17 @@ pub async fn analyze_video(
     }
     let video = client.process_video(video_source)?;
     client
-        .completion_with_retry(prompts::VIDEO_ANALYSIS, vec![video], prompt, DEFAULT_RETRIES)
+        .completion_with_retry(
+            prompts::VIDEO_ANALYSIS,
+            vec![video],
+            prompt,
+            DEFAULT_RETRIES,
+        )
         .await
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::prompts;
 
     #[test]

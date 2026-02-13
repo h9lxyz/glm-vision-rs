@@ -54,15 +54,12 @@ impl VisionClient {
             );
         }
 
-        let ext = path
-            .extension()
-            .and_then(|e| e.to_str())
-            .unwrap_or("");
-        let mime = image_mime_type(ext)
-            .with_context(|| format!("Unsupported image format: .{}", ext))?;
+        let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
+        let mime =
+            image_mime_type(ext).with_context(|| format!("Unsupported image format: .{}", ext))?;
 
-        let data = std::fs::read(path)
-            .with_context(|| format!("Failed to read image: {}", source))?;
+        let data =
+            std::fs::read(path).with_context(|| format!("Failed to read image: {}", source))?;
         let b64 = base64::Engine::encode(&base64::engine::general_purpose::STANDARD, &data);
         let data_url = format!("data:{};base64,{}", mime, b64);
 
@@ -100,15 +97,12 @@ impl VisionClient {
             );
         }
 
-        let ext = path
-            .extension()
-            .and_then(|e| e.to_str())
-            .unwrap_or("");
-        let mime = video_mime_type(ext)
-            .with_context(|| format!("Unsupported video format: .{}", ext))?;
+        let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
+        let mime =
+            video_mime_type(ext).with_context(|| format!("Unsupported video format: .{}", ext))?;
 
-        let data = std::fs::read(path)
-            .with_context(|| format!("Failed to read video: {}", source))?;
+        let data =
+            std::fs::read(path).with_context(|| format!("Failed to read video: {}", source))?;
         let b64 = base64::Engine::encode(&base64::engine::general_purpose::STANDARD, &data);
         let data_url = format!("data:{};base64,{}", mime, b64);
 
@@ -194,8 +188,8 @@ impl VisionClient {
             .completion_raw(system_prompt, content_parts, user_prompt)
             .await?;
 
-        let chat_response: VisionChatResponse = serde_json::from_str(&raw)
-            .context("Failed to parse vision API response")?;
+        let chat_response: VisionChatResponse =
+            serde_json::from_str(&raw).context("Failed to parse vision API response")?;
 
         chat_response
             .choices
@@ -224,8 +218,7 @@ impl VisionClient {
                 Ok(result) => return Ok(result),
                 Err(e) => {
                     let err_str = e.to_string();
-                    let is_retryable = err_str.contains("HTTP 429")
-                        || err_str.contains("HTTP 5");
+                    let is_retryable = err_str.contains("HTTP 429") || err_str.contains("HTTP 5");
 
                     if !is_retryable || attempt == max_retries {
                         return Err(e);
@@ -256,9 +249,7 @@ mod tests {
     #[test]
     fn test_process_image_url_passthrough() {
         let client = VisionClient::new(VisionConfig::new("test-key"));
-        let part = client
-            .process_image("https://example.com/img.png")
-            .unwrap();
+        let part = client.process_image("https://example.com/img.png").unwrap();
         match part {
             ContentPart::ImageUrl { image_url } => {
                 assert_eq!(image_url.url, "https://example.com/img.png");
@@ -270,9 +261,7 @@ mod tests {
     #[test]
     fn test_process_video_url_passthrough() {
         let client = VisionClient::new(VisionConfig::new("test-key"));
-        let part = client
-            .process_video("https://example.com/vid.mp4")
-            .unwrap();
+        let part = client.process_video("https://example.com/vid.mp4").unwrap();
         match part {
             ContentPart::VideoUrl { video_url } => {
                 assert_eq!(video_url.url, "https://example.com/vid.mp4");
@@ -305,9 +294,7 @@ mod tests {
         std::fs::write(&img_path, b"fake-png-data").unwrap();
 
         let client = VisionClient::new(VisionConfig::new("test-key"));
-        let part = client
-            .process_image(img_path.to_str().unwrap())
-            .unwrap();
+        let part = client.process_image(img_path.to_str().unwrap()).unwrap();
         match part {
             ContentPart::ImageUrl { image_url } => {
                 assert!(image_url.url.starts_with("data:image/png;base64,"));
@@ -323,9 +310,7 @@ mod tests {
         std::fs::write(&vid_path, b"fake-mp4-data").unwrap();
 
         let client = VisionClient::new(VisionConfig::new("test-key"));
-        let part = client
-            .process_video(vid_path.to_str().unwrap())
-            .unwrap();
+        let part = client.process_video(vid_path.to_str().unwrap()).unwrap();
         match part {
             ContentPart::VideoUrl { video_url } => {
                 assert!(video_url.url.starts_with("data:video/mp4;base64,"));
