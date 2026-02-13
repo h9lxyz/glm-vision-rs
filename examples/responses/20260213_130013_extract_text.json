@@ -1,0 +1,29 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "\n## Extracted Text\n\n```markdown\nNANOBI\nAI Agent Automation\n\nDashboard\nChat\nPipeline\nSessions\nAgents\n\nDashboard\nLive glm-4.7\n\n1\nActive Sessions\n\n20\nTotal Messages\n\n8\nRegistered Tools\n\n4\nAgents\n\n50m\nUptime\n\n35\nArchived Sessions\n\nAGENTS\nKrillMeister DEFAULT glm-4.7\nAtlas glm-4.7\nNova glm-4.7\nEcho glm-4.7\n\nRECENT ACTIVITY 0 events\nNo activity yet. Send a message to get started.\n\nTOOLS 8 registered\nspawn_subagent Spawn an independent subagent to handle a complex task asynchronously. The result will be delivered to the user when complete.\nuse_skill Load a skill's full instructions by name. Use discover_skills in the system prompt to see available skills.\nedit_file Edit a file by replacing an exact text match with new text\nread_file Read contents of a file at the given path\nweb_fetch Fetch content from a URL via HTTP GET\nlist_dir List contents of a directory\nwrite_file Write content to a file at the given path. Cannot overwrite protected workspace config files (SOUL.md, AGENTS.md, etc.).\nexec Execute a shell command. Protected workspace files (SOUL.md, AGENTS.md, etc.) must not be deleted or overwritten.\n\nSYSTEM\nMEMORY (RSS)\n34.8 MB\nProcess resident memory\n\nCPU TIME\n2.0s\nTotal user + system CPU\n\nUPTIME\n50m\n1 active, 35 archived\n\nNOVA WORKSPACE\n628 B\n/home/h9L/.nanobit/agents/...\n\nDEFAULT WORKSPACE\n296.2 KB\n/home/h9L/.nanobit/workspace...\n\nMAIN WORKSPACE\n296.2 KB\n/home/h9L/.nanobit/workspace...\n\nECHO WORKSPACE\n24.3 KB\n/home/h9L/.nanobit/agents/...\n\nATLAS WORKSPACE\n5.9 KB\n/home/h9L/.nanobit/agents/...\n```\n\n## Content Type\nDashboard interface for an AI agent automation platform showing system statistics, agent status, recent activity, available tools, and system resource information.\n\n## Language/Format\nWeb dashboard interface with structured sections and statistics display.\n\n## OCR Corrections\n- No significant OCR corrections needed as the text was clearly legible in the screenshot.\n- Preserved the exact spacing and layout as shown in the interface.\n\n## Quality Notes\n- The text appears to be from a dark-themed dashboard interface with good contrast.\n- All text elements are clearly visible and complete in the screenshot.\n- The layout includes a sidebar navigation, main dashboard area with statistics cards, and multiple sections (Agents, Recent Activity, Tools, System).\n- The interface shows a live status indicator with \"glm-4.7\" model version.\n- System paths are visible in the workspace sections showing file system locations.\n- The layout maintains proper hierarchical structure with section headers and corresponding content.",
+        "reasoning_content": "Let me analyze the screenshot carefully to extract all visible text while preserving the structure and formatting.\n\nLooking at the screenshot, I can see this is a dashboard interface with several sections:\n\n1. A sidebar on the left with navigation items\n2. A main dashboard area with:\n   - Dashboard header\n   - Statistics cards\n   - Agents section\n   - Recent Activity section\n   - Tools section\n   - System information section\n\nLet me extract all the text I can see:\n\n**Sidebar:**\n- \"NANOBI\"\n- \"AI Agent Automation\"\n- \"Dashboard\" (selected)\n- \"Chat\"\n- \"Pipeline\"\n- \"Sessions\"\n- \"Agents\"\n\n**Main Dashboard:**\n- \"Dashboard\"\n- \"Live glm-4.7\"\n- Statistics cards:\n  - \"1 Active Sessions\"\n  - \"20 Total Messages\"\n  - \"8 Registered Tools\"\n  - \"4 Agents\"\n  - \"50m Uptime\"\n  - \"35 Archived Sessions\"\n\n**Agents Section:**\n- \"AGENTS\"\n- \"KrillMeister DEFAULT glm-4.7\"\n- \"Atlas glm-4.7\"\n- \"Nova glm-4.7\"\n- \"Echo glm-4.7\"\n\n**Recent Activity Section:**\n- \"RECENT ACTIVITY 0 events\"\n- \"No activity yet. Send a message to get started.\"\n\n**Tools Section:**\n- \"TOOLS 8 registered\"\n- \"spawn_subagent Spawn an independent subagent to handle a complex task asynchronously. The result will be delivered to the user when complete.\"\n- \"use_skill Load a skill's full instructions by name. Use discover_skills in the system prompt to see available skills.\"\n- \"edit_file Edit a file by replacing an exact text match with new text\"\n- \"read_file Read contents of a file at the given path\"\n- \"web_fetch Fetch content from a URL via HTTP GET\"\n- \"list_dir List contents of a directory\"\n- \"write_file Write content to a file at the given path. Cannot overwrite protected workspace config files (SOUL.md, AGENTS.md, etc.).\"\n- \"exec Execute a shell command. Protected workspace files (SOUL.md, AGENTS.md, etc.) must not be deleted or overwritten.\"\n\n**System Section:**\n- \"SYSTEM\"\n- \"MEMORY (RSS) 34.8 MB Process resident memory\"\n- \"CPU TIME 2.0s Total user + system CPU\"\n- \"UPTIME 50m 1 active, 35 archived\"\n- \"NOVA WORKSPACE 628 B /home/h9L/.nanobit/agents/...\"\n- \"DEFAULT WORKSPACE 296.2 KB /home/h9L/.nanobit/workspace...\"\n- \"MAIN WORKSPACE 296.2 KB /home/h9L/.nanobit/workspace...\"\n- \"ECHO WORKSPACE 24.3 KB /home/h9L/.nanobit/agents/...\"\n- \"ATLAS WORKSPACE 5.9 KB /home/h9L/.nanobit/agents/...\"\n\nI need to be careful about the exact formatting and spacing. Let me make sure I capture everything accurately.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1770984013,
+  "id": "202602131959129fe5ae5ccf8d41e5",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "202602131959129fe5ae5ccf8d41e5",
+  "usage": {
+    "completion_tokens": 1270,
+    "completion_tokens_details": {
+      "reasoning_tokens": 649
+    },
+    "prompt_tokens": 4034,
+    "prompt_tokens_details": {
+      "cached_tokens": 1276
+    },
+    "total_tokens": 5304
+  }
+}
