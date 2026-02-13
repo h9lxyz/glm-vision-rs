@@ -1,0 +1,16 @@
+name: Publish to crates.io
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - run: apk add --no-cache rust cargo
+      - uses: actions/checkout@v6
+      - run: cargo test
+      - run: cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}

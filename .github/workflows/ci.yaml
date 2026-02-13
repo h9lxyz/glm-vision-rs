@@ -1,0 +1,17 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container: alpine:latest
+    steps:
+      - run: apk add --no-cache rust cargo
+      - uses: actions/checkout@v6
+      - run: cargo fmt --check
+      - run: cargo clippy -- -D warnings
+      - run: cargo test
