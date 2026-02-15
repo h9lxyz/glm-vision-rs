@@ -51,6 +51,5 @@ pub trait HttpClient: Send + Sync {
         url: &str,
         headers: &[(&str, &str)],
         body: &[u8],
-    ) -> impl Future<Output = Result<HttpResponse, Box<dyn std::error::Error + Send + Sync>>>
-           + Send;
+    ) -> impl Future<Output = Result<HttpResponse, Box<dyn std::error::Error + Send + Sync>>> + Send;
 }
