@@ -40,15 +40,50 @@ Three built-in providers are supported. If none is configured, you must set `bas
 
 ## Usage
 
+### HTTP Client
+
+This library does not bundle an HTTP client. You provide your own by implementing the `HttpClient` trait, which lets you use whatever HTTP crate (and version) your project already depends on.
+
+```rust
+use glm_vision_rs::{HttpClient, HttpResponse};
+
+struct ReqwestClient(reqwest::Client);
+
+impl HttpClient for ReqwestClient {
+    async fn post(
+        &self,
+        url: &str,
+        headers: &[(&str, &str)],
+        body: &[u8],
+    ) -> Result<HttpResponse, Box<dyn std::error::Error + Send + Sync>> {
+        let mut req = self.0.post(url);
+        for &(k, v) in headers {
+            req = req.header(k, v);
+        }
+        let resp = req.body(body.to_vec()).send().await?;
+        Ok(HttpResponse {
+            status: resp.status().as_u16(),
+            body: resp.text().await?,
+        })
+    }
+}
+```
+
 ### Setup
 
 ```rust
-use glm_vision::{Provider, VisionClient, VisionConfig};
+use glm_vision_rs::{Provider, VisionClient, VisionConfig};
 
 let config = VisionConfig::new("your-api-key")
     .with_provider(Provider::ZaiCoding);
 
-let client = VisionClient::new(config);
+let http = ReqwestClient(
+    reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(config.timeout_secs))
+        .build()?,
+);
+
+let client = VisionClient::new(config, http);
 ```
 
 ### Configuration

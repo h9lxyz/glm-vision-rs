@@ -2,21 +2,22 @@ use anyhow::{bail, Context, Result};
 use std::path::Path;
 
 use crate::config::VisionConfig;
+use crate::http::HttpClient;
 use crate::types::*;
 
 /// HTTP client for the GLM-4V vision completions API.
-pub struct VisionClient {
-    http: reqwest::Client,
+pub struct VisionClient<H: HttpClient> {
+    http: H,
     config: VisionConfig,
 }
 
-impl VisionClient {
-    /// Create a new VisionClient with the given configuration.
-    pub fn new(config: VisionConfig) -> Self {
-        let http = reqwest::Client::builder()
-            .timeout(std::time::Duration::from_secs(config.timeout_secs))
-            .build()
-            .unwrap_or_default();
+impl<H: HttpClient> VisionClient<H> {
+    /// Create a new VisionClient with the given configuration and HTTP client.
+    ///
+    /// The caller is responsible for configuring the HTTP client (timeouts, TLS,
+    /// proxies, etc.). See [`VisionConfig::timeout_secs`] for the recommended
+    /// timeout value.
+    pub fn new(config: VisionConfig, http: H) -> Self {
         Self { http, config }
     }
 
@@ -151,30 +152,30 @@ impl VisionClient {
         };
 
         let url = self.config.completions_url();
-        log::info!("Requesting vision completion: model={}", self.config.model);
+        let body = serde_json::to_vec(&request).context("Failed to serialize request")?;
+        let auth = format!("Bearer {}", self.config.api_key);
+        let headers = [
+            ("Authorization", auth.as_str()),
+            ("Content-Type", "application/json"),
+            ("X-Title", "4.5V MCP Local"),
+            ("Accept-Language", "en-US,en"),
+        ];
 
         let response = self
             .http
-            .post(&url)
-            .header("Authorization", format!("Bearer {}", self.config.api_key))
-            .header("Content-Type", "application/json")
-            .header("X-Title", "4.5V MCP Local")
-            .header("Accept-Language", "en-US,en")
-            .json(&request)
-            .send()
+            .post(&url, &headers, &body)
             .await
-            .context("Failed to send vision API request")?;
+            .map_err(|e| anyhow::anyhow!("Failed to send vision API request: {e}"))?;
 
-        let status = response.status();
-        if !status.is_success() {
-            let body = response.text().await.unwrap_or_default();
-            bail!("Vision API error HTTP {}: {}", status, body);
+        if !response.is_success() {
+            bail!(
+                "Vision API error HTTP {}: {}",
+                response.status,
+                response.body
+            );
         }
 
-        response
-            .text()
-            .await
-            .context("Failed to read vision API response body")
+        Ok(response.body)
     }
 
     /// Send a vision completion request and return the extracted text content.
@@ -225,13 +226,6 @@ impl VisionClient {
                     }
 
                     let wait = std::time::Duration::from_millis(1000 * 2u64.pow(attempt));
-                    log::warn!(
-                        "Vision API request failed (attempt {}/{}), retrying in {:?}: {}",
-                        attempt + 1,
-                        max_retries + 1,
-                        wait,
-                        err_str
-                    );
                     tokio::time::sleep(wait).await;
                     last_err = Some(e);
                 }
@@ -245,10 +239,28 @@ impl VisionClient {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::http::HttpResponse;
+
+    struct NoopHttp;
+
+    impl HttpClient for NoopHttp {
+        async fn post(
+            &self,
+            _url: &str,
+            _headers: &[(&str, &str)],
+            _body: &[u8],
+        ) -> Result<HttpResponse, Box<dyn std::error::Error + Send + Sync>> {
+            unimplemented!("NoopHttp should not make actual requests")
+        }
+    }
+
+    fn test_client() -> VisionClient<NoopHttp> {
+        VisionClient::new(VisionConfig::new("test-key"), NoopHttp)
+    }
 
     #[test]
     fn test_process_image_url_passthrough() {
-        let client = VisionClient::new(VisionConfig::new("test-key"));
+        let client = test_client();
         let part = client.process_image("https://example.com/img.png").unwrap();
         match part {
             ContentPart::ImageUrl { image_url } => {
@@ -260,7 +272,7 @@ mod tests {
 
     #[test]
     fn test_process_video_url_passthrough() {
-        let client = VisionClient::new(VisionConfig::new("test-key"));
+        let client = test_client();
         let part = client.process_video("https://example.com/vid.mp4").unwrap();
         match part {
             ContentPart::VideoUrl { video_url } => {
@@ -272,7 +284,7 @@ mod tests {
 
     #[test]
     fn test_process_image_file_not_found() {
-        let client = VisionClient::new(VisionConfig::new("test-key"));
+        let client = test_client();
         let result = client.process_image("/nonexistent/image.png");
         assert!(result.is_err());
         assert!(result.unwrap_err().to_string().contains("not found"));
@@ -280,7 +292,7 @@ mod tests {
 
     #[test]
     fn test_process_video_file_not_found() {
-        let client = VisionClient::new(VisionConfig::new("test-key"));
+        let client = test_client();
         let result = client.process_video("/nonexistent/video.mp4");
         assert!(result.is_err());
         assert!(result.unwrap_err().to_string().contains("not found"));
@@ -293,7 +305,7 @@ mod tests {
         // Write a minimal valid byte sequence (not a real PNG, but enough for encoding)
         std::fs::write(&img_path, b"fake-png-data").unwrap();
 
-        let client = VisionClient::new(VisionConfig::new("test-key"));
+        let client = test_client();
         let part = client.process_image(img_path.to_str().unwrap()).unwrap();
         match part {
             ContentPart::ImageUrl { image_url } => {
@@ -309,7 +321,7 @@ mod tests {
         let vid_path = dir.path().join("test.mp4");
         std::fs::write(&vid_path, b"fake-mp4-data").unwrap();
 
-        let client = VisionClient::new(VisionConfig::new("test-key"));
+        let client = test_client();
         let part = client.process_video(vid_path.to_str().unwrap()).unwrap();
         match part {
             ContentPart::VideoUrl { video_url } => {
@@ -325,7 +337,7 @@ mod tests {
         let img_path = dir.path().join("test.gif");
         std::fs::write(&img_path, b"fake-gif").unwrap();
 
-        let client = VisionClient::new(VisionConfig::new("test-key"));
+        let client = test_client();
         let result = client.process_image(img_path.to_str().unwrap());
         assert!(result.is_err());
         assert!(result.unwrap_err().to_string().contains("Unsupported"));

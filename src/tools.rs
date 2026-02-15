@@ -1,6 +1,7 @@
 use anyhow::{bail, Result};
 
 use crate::client::VisionClient;
+use crate::http::HttpClient;
 use crate::prompts;
 
 const DEFAULT_RETRIES: u32 = 2;
@@ -13,7 +14,7 @@ const DEFAULT_RETRIES: u32 = 2;
 /// - `Some("spec")` — generate a technical spec
 /// - `Some("description")` — generate a text description
 pub async fn ui_to_artifact(
-    client: &VisionClient,
+    client: &VisionClient<impl HttpClient>,
     image_source: &str,
     output_type: Option<&str>,
     prompt: &str,
@@ -36,7 +37,7 @@ pub async fn ui_to_artifact(
 ///
 /// Optionally specify `programming_language` to enhance extraction accuracy.
 pub async fn extract_text(
-    client: &VisionClient,
+    client: &VisionClient<impl HttpClient>,
     image_source: &str,
     prompt: &str,
     programming_language: Option<&str>,
@@ -60,7 +61,7 @@ pub async fn extract_text(
 ///
 /// Optionally provide `context` (e.g., what the user was doing when the error occurred).
 pub async fn diagnose_error(
-    client: &VisionClient,
+    client: &VisionClient<impl HttpClient>,
     image_source: &str,
     prompt: &str,
     context: Option<&str>,
@@ -84,7 +85,7 @@ pub async fn diagnose_error(
 ///
 /// Optionally specify `diagram_type` (e.g., "UML class", "sequence", "ER", "flowchart").
 pub async fn understand_diagram(
-    client: &VisionClient,
+    client: &VisionClient<impl HttpClient>,
     image_source: &str,
     prompt: &str,
     diagram_type: Option<&str>,
@@ -108,7 +109,7 @@ pub async fn understand_diagram(
 ///
 /// Optionally specify `analysis_focus` (e.g., "trends", "anomalies", "comparison").
 pub async fn analyze_data_viz(
-    client: &VisionClient,
+    client: &VisionClient<impl HttpClient>,
     image_source: &str,
     prompt: &str,
     analysis_focus: Option<&str>,
@@ -130,7 +131,7 @@ pub async fn analyze_data_viz(
 
 /// Compare two UI screenshots (expected vs actual) for visual regression.
 pub async fn ui_diff_check(
-    client: &VisionClient,
+    client: &VisionClient<impl HttpClient>,
     expected: &str,
     actual: &str,
     prompt: &str,
@@ -157,7 +158,7 @@ pub async fn ui_diff_check(
 
 /// General-purpose image analysis.
 pub async fn analyze_image(
-    client: &VisionClient,
+    client: &VisionClient<impl HttpClient>,
     image_source: &str,
     prompt: &str,
 ) -> Result<String> {
@@ -177,7 +178,7 @@ pub async fn analyze_image(
 
 /// Analyze video content.
 pub async fn analyze_video(
-    client: &VisionClient,
+    client: &VisionClient<impl HttpClient>,
     video_source: &str,
     prompt: &str,
 ) -> Result<String> {
